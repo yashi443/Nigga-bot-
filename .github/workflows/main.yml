@@ -1,33 +1,39 @@
 
-  on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-      print_tags:
-        description: 'True to print to STDOUT'
-        required: true
-        type: boolean
-      tags:
-        description: 'Test scenario tags'
-        required: true
-        type: string
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
-        required: true
+  name: Node.js Bot CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:   # Manual run option
 
 jobs:
-  print-tag:
+  build:
     runs-on: ubuntu-latest
-    if: ${{ inputs.print_tags }} 
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
     steps:
-      - name: Print the input tag to STDOUT
-        run: echo  The tags are ${{ inputs.tags }}
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run bot
+      - name: Start bot
+        env:
+          PORT: 8080
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}   # Add your bot token in GitHub Secrets
+        run: npm start
