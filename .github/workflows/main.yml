@@ -1,5 +1,4 @@
-
-  name: Deploy Node.js Bot to Railway
+name: Run Messenger Bot
 
 on:
   push:
@@ -7,28 +6,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Deploy to Railway
-      - name: Deploy to Railway
-        uses: railwayapp/railway-action@v2
-        with:
-          railwayToken: ${{ secrets.RAILWAY_API_KEY }}  # Add Railway API key in GitHub Secrets
-          projectId: ${{ secrets.RAILWAY_PROJECT_ID }}  # Add Railway Project ID in Secrets
-          environment: production
+      - name: Run bot (test run)
+        env:
+          PAGE_TOKEN: ${{ secrets.PAGE_TOKEN }}
+          VERIFY_TOKEN: test123
+          PORT: 3000
+        run: |
+          echo "Bot starting..."
+          node index.js &
+          sleep 60
+          echo "Bot ran for 60 seconds"
+  
