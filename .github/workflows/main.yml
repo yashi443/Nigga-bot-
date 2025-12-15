@@ -1,26 +1,33 @@
 
-  name: CI # The name of the workflow, displayed in the Actions tab
-on:
-  push:
-    branches: [ main ] # Triggers the workflow on pushes to the main branch
-  pull_request:
-    branches: [ main ] # Triggers the workflow on pull requests to the main branch
+  on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
+      tags:
+        description: 'Test scenario tags'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest # The type of runner (virtual machine) to use
-
+  print-tag:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.print_tags }} 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4 # An action to check out your repository code
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '14' # Specifies the Node.js version to use
-
-    - name: Install dependencies
-      run: npm install # Runs a shell command
-
-    - name: Run tests
-      run: npm test # Runs a shell command
+      - name: Print the input tag to STDOUT
+        run: echo  The tags are ${{ inputs.tags }}
