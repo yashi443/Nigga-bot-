@@ -1,3 +1,4 @@
+
 name: Run Messenger Bot
 
 on:
@@ -31,4 +32,3 @@ jobs:
           node index.js &
           sleep 60
           echo "Bot ran for 60 seconds"
-  
